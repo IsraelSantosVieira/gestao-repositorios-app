@@ -1,0 +1,48 @@
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
+    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+            <!-- Logo -->
+            <img
+              src="assets/images/logo.png"
+              class="w-100"
+              alt="Logo image">
+
+            <!-- Title -->
+            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Cadastrar</div>
+            <div class="flex items-baseline mt-0.5 font-medium">
+                <div>Você já tem uma conta?</div>
+                <a
+                    class="ml-1 text-primary-500 hover:underline"
+                    [routerLink]="['/sign-in']">Entrar
+                </a>
+            </div>
+
+            <!-- Alert -->
+
+            <!-- Sign Up form -->
+            <form
+                class="mt-8"
+                [formGroup]="signUpForm"
+                #signUpNgForm="ngForm">
+
+                <!-- Name field -->
+
+
+                <!-- Email field -->
+
+
+                <!-- Password field -->
+
+                <!-- Company field -->
+
+                <!-- ToS and PP -->
+                <div class="inline-flex items-end w-full mt-1.5">
+
+                </div>
+
+                <!-- Submit button -->
+
+            </form>
+        </div>
+    </div>
+</div>

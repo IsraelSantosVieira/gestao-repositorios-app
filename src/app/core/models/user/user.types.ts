@@ -1,4 +1,4 @@
-import { ViewModel } from 'app/core/models/view-model.types';
+import { ViewModel } from 'app/core/models/base/view-model.types';
 
 export interface User extends ViewModel
 {

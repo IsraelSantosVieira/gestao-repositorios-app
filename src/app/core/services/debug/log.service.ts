@@ -3,14 +3,7 @@ import { environment } from 'environments/environment';
 import { LogLevel } from 'app/core/models/enums/log-level.types';
 import { MessageService } from 'primeng/api';
 import MessageConstants from 'app/shared/constants/message.constants';
-
-export interface LogMessage
-{
-  logLevel: LogLevel;
-  message: string;
-  summary?: string;
-  exception?: string;
-}
+import { LogMessage } from 'app/core/models/base/log-message.types';
 
 /**
  * Log Service
@@ -36,8 +29,8 @@ export class LogService {
     this.createMessage(
       {
         logLevel: LogLevel.Error,
-        summary: MessageConstants.ERROR_MESSAGES.client.summary,
-        message: MessageConstants.ERROR_MESSAGES.client.detail,
+        summary: MessageConstants.ERROR.client.summary,
+        message: MessageConstants.ERROR.client.detail,
         exception: exception
       });
   }
@@ -91,7 +84,7 @@ export class LogService {
 
     if ( this.consoleLogIsEnabled )
     {
-      console.error(`[Critical]: ${exception}`);
+      this.systemLog('[Critical]:', exception);
     }
   }
 
@@ -106,7 +99,7 @@ export class LogService {
 
     if ( this.consoleLogIsEnabled )
     {
-      console.error(`[Error]: ${exception}`);
+      this.systemLog('[Error]:', exception);
     }
   }
 
@@ -121,7 +114,7 @@ export class LogService {
 
     if ( this.consoleLogIsEnabled )
     {
-      console.warn(`[Warning]: ${exception}`);
+      this.systemLog('[Warning]:', exception);
     }
   }
 
@@ -136,7 +129,7 @@ export class LogService {
 
     if ( this.consoleLogIsEnabled )
     {
-      console.log(`[Info]: ${exception}`);
+      this.systemLog('[Info]:', exception);
     }
   }
 
@@ -146,12 +139,27 @@ export class LogService {
       {
         severity: 'warn',
         summary: 'DEBUG',
-        detail: exception
+        detail: this.getObjectLog(exception)
       });
 
     if ( this.consoleLogIsEnabled )
     {
-      console.log(`[Debug]: ${exception}`);
+      this.systemLog('[Debug]:', exception);
     }
+  }
+
+  private systemLog(prefix: string, obj: any): void
+  {
+    console.log(prefix + ' ' + this.getObjectLog(obj));
+  }
+
+  private getObjectLog(obj: any): string
+  {
+    if (typeof obj === 'object' && obj != null)
+    {
+      return JSON.stringify(obj);
+    }
+
+    return obj;
   }
 }

@@ -46,7 +46,7 @@
           </div>
 
           <!-- Password field -->
-          <div class="mt-8 flex flex-col">
+          <div class="mt-6 flex flex-col">
             <span class="p-float-label w-full">
               <p-password id="password"
                           formControlName="password"
@@ -71,7 +71,7 @@
           </div>
 
           <!-- Actions -->
-          <div class="inline-flex items-end justify-between w-full mt-2">
+          <div class="inline-flex items-end justify-between w-full mt-6">
             <div>
               <p-checkbox formControlName="rememberMe"
                           inputId="remember"
@@ -88,7 +88,7 @@
             [asyncCall]="signIn"
             [onReceiveData]="onReceiveAuthResult"
             [onReceiveError]="onReceiveAuthError"
-            [disabled]="signInForm.invalid"
+            [disabled]="signInForm.invalid || submitted"
           ></app-async-button>
         </form>
       </div>

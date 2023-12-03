@@ -5,10 +5,11 @@ import { baseAnimations } from 'app/shared/modules/animations';
 import { AuthService } from 'app/core/services/auth/auth.service';
 import { Message } from 'primeng/api';
 import MessageConstants from 'app/shared/constants/message.constants';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 import { environment } from 'environments/environment';
 import { LogService } from 'app/core/services/debug/log.service';
 import StringUtils from 'app/shared/utils/string-utils';
+import ExceptionUtils from 'app/shared/utils/exception-utils';
 import { LogLevel } from 'app/core/models/enums/log-level.types';
 
 @Component({
@@ -92,7 +93,9 @@ export class AuthSignInComponent implements OnInit
     this.signInForm.disable();
     this.signInMessages = [];
 
-    return this._authService.signIn(this.signInForm.value);
+    return this._authService.signIn(this.signInForm.value).pipe(
+      catchError(error => ExceptionUtils.createServerException(error, this._logService))
+    );
   }
 
   // -----------------------------------------------------------------------------------------------------
@@ -103,8 +106,14 @@ export class AuthSignInComponent implements OnInit
   {
     this.submitted = false;
 
-    if ( response != null )
+    if ( response?.success )
     {
+      this._logService.createMessage({
+        logLevel: LogLevel.Success,
+        summary: MessageConstants.SUCCESS.loginSuccess.summary,
+        message: MessageConstants.SUCCESS.loginSuccess.detail
+      });
+
       const redirectURL = this._activatedRoute.snapshot
         .queryParamMap.get('redirectURL') || '/signed-in-redirect';
 
@@ -112,7 +121,7 @@ export class AuthSignInComponent implements OnInit
     }
     else
     {
-      this._logService.createClientError('Mensagem de autenticação inválida');
+      this.setupErrorMessage(response);
       this.signInForm.enable();
       this.signInNgForm.resetForm();
     }
@@ -122,14 +131,21 @@ export class AuthSignInComponent implements OnInit
   {
     this.signInForm.enable();
     this.signInNgForm.resetForm();
-    this._logService.debug(error?.toString());
+    this._logService.debug(error);
+    this.setupErrorMessage(error);
     this.submitted = false;
+  }
+
+  private setupErrorMessage = (error: any): void =>
+  {
+    let serverError: string = ExceptionUtils.getServerErrorMessage(error,
+      MessageConstants.ERROR.loginFailed.detail);
 
     this.signInMessages = [
       {
         severity: 'error',
         summary: StringUtils.empty(),
-        detail: MessageConstants.ERROR_MESSAGES.loginFailed.detail,
+        detail: serverError,
       }
     ]
   }

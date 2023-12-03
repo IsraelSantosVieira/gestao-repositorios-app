@@ -31,9 +31,12 @@ export class AsyncButtonComponent implements OnDestroy {
   {
     if( this.asyncCall )
     {
+      this._loading = true;
+
       this.asyncCall()
         .pipe(
-          finalize((): boolean => this._loading = false))
+          takeUntil(this._destroy$),
+          finalize((): void => { this._loading = false; } ))
         .subscribe((response): void =>
         {
           if ( this.onReceiveData )
@@ -55,8 +58,11 @@ export class AsyncButtonComponent implements OnDestroy {
 
   ngOnDestroy(): void
   {
-    this._destroy$.next();
-    this._destroy$.complete();
+    if ( this._destroy$ )
+    {
+      this._destroy$.next();
+      this._destroy$.complete();
+    }
   }
 
 }

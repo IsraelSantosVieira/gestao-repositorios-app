@@ -1,5 +1,6 @@
-export default class MessageConstants {
-  static readonly ERROR_MESSAGES = {
+export default class MessageConstants
+{
+  static readonly ERROR = {
     loginFailed: {
       summary: 'Login Falhou',
       detail: 'Usuário ou senha incorretos.'
@@ -26,7 +27,7 @@ export default class MessageConstants {
     }
   };
 
-  static readonly WARNING_MESSAGES = {
+  static readonly WARNING = {
     unsavedChanges: {
       summary: 'Alterações Não Salvas',
       detail: 'Você tem alterações não salvas. Deseja sair sem salvar?'
@@ -37,9 +38,9 @@ export default class MessageConstants {
     },
   };
 
-  static readonly SUCCESS_MESSAGES = {
+  static readonly SUCCESS = {
     loginSuccess: {
-      summary: 'Login Bem-sucedido',
+      summary: 'Login bem-sucedido',
       detail: 'Você entrou com sucesso no sistema.'
     },
     accountCreated: {
@@ -52,7 +53,7 @@ export default class MessageConstants {
     },
   };
 
-  static readonly INFO_MESSAGES = {
+  static readonly INFO = {
     passwordReset: {
       summary: 'Redefinição de Senha',
       detail: 'Um link para redefinição de senha foi enviado para seu e-mail.'

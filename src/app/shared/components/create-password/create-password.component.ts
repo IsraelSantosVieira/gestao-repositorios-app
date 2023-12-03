@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { UntypedFormGroup } from '@angular/forms';
+import PasswordUtils from 'app/shared/utils/password-utils';
 
 @Component({
   selector: 'app-create-password',
@@ -7,4 +9,8 @@ import { Component } from '@angular/core';
 })
 export class CreatePasswordComponent
 {
+  @Input() formControlName: string = 'password';
+  @Input() formGroup!: UntypedFormGroup;
+
+  protected readonly PasswordUtils = PasswordUtils;
 }

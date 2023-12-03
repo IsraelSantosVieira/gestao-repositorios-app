@@ -1,8 +1,18 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
+import { NgForm, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { baseAnimations } from 'app/shared/modules/animations';
 import { AuthService } from 'app/core/services/auth/auth.service';
+import { Observable, of } from 'rxjs';
+import { Message } from 'primeng/api';
+import ExceptionUtils from 'app/shared/utils/exception-utils';
+import MessageConstants from 'app/shared/constants/message.constants';
+import StringUtils from 'app/shared/utils/string-utils';
+import PasswordUtils from 'app/shared/utils/password-utils';
+import PatternConstants from 'app/shared/constants/pattern.constants';
+import { MessageInfo } from 'app/core/models/base/message-info.types';
+import { LogService } from 'app/core/services/debug/log.service';
+import { LogLevel } from 'app/core/models/enums/log-level.types';
 
 @Component({
     selector     : 'auth-sign-up',
@@ -12,84 +22,123 @@ import { AuthService } from 'app/core/services/auth/auth.service';
 })
 export class AuthSignUpComponent implements OnInit
 {
-    @ViewChild('signUpNgForm') signUpNgForm!: NgForm;
+  @ViewChild('signUpNgForm') signUpNgForm!: NgForm;
 
-    signUpForm!: UntypedFormGroup;
-    showAlert: boolean = false;
+  signUpForm!: UntypedFormGroup;
+  signUpMessages: Message[] = [];
 
-    /**
-     * Constructor
-     */
-    constructor(
-        private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder,
-        private _router: Router
-    )
+  protected submitted: boolean = false;
+  protected agreeTermsVisible: boolean = false;
+
+  /**
+   * Constructor
+   */
+  constructor(
+    private _authService: AuthService,
+    private _formBuilder: UntypedFormBuilder,
+    private _router: Router,
+    private _logService: LogService
+  )
+  {
+  }
+
+  // -----------------------------------------------------------------------------------------------------
+  // @ Lifecycle hooks
+  // -----------------------------------------------------------------------------------------------------
+
+  /**
+   * On init
+   */
+  ngOnInit(): void
+  {
+    this.signUpForm = this._formBuilder.group(
+      {
+        email       : ['', [Validators.required, Validators.email]],
+        password    : ['', Validators.required],
+        firstName   : ['', Validators.required],
+        lastName    : ['', Validators.required],
+        phone       : ['', Validators.required, Validators.pattern(PatternConstants.Phone)],
+        agreements  : ['', Validators.requiredTrue]
+      });
+  }
+
+  // -----------------------------------------------------------------------------------------------------
+  // @ Public methods
+  // -----------------------------------------------------------------------------------------------------
+
+  /**
+   * Sign up
+   */
+  signUp = (): Observable<any> =>
+  {
+    this.submitted = true;
+
+    if ( this.signUpForm.invalid )
     {
+      return of(null);
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
-    ngOnInit(): void
+    const password = this.signUpForm.get('password')?.value;
+    if ( !PasswordUtils.isValid(password) )
     {
-        // Create the form
-        this.signUpForm = this._formBuilder.group({
-                name      : ['', Validators.required],
-                email     : ['', [Validators.required, Validators.email]],
-                password  : ['', Validators.required],
-                company   : [''],
-                agreements: ['', Validators.requiredTrue]
-            }
-        );
+      const message: MessageInfo = MessageConstants.ERROR.passwordIsWeak;
+      return of(ExceptionUtils.createClientException(message.detail));
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
+    this.signUpForm.disable();
+    return this._authService.signUp({
+      ...this.signUpForm.value,
+      phone: StringUtils.removePhoneFormatting(this.signUpForm.get('phone')?.value)
+    });
+  }
 
-    /**
-     * Sign up
-     */
-    signUp(): void
+  onReceiveResult = (response: any): void =>
+  {
+    if ( response.success )
     {
-        // Do nothing if the form is invalid
-        if ( this.signUpForm.invalid )
-        {
-            return;
-        }
+      this._logService.createMessage({
+        logLevel: LogLevel.Success,
+        summary: MessageConstants.SUCCESS.accountCreated.summary,
+        message: MessageConstants.SUCCESS.accountCreated.detail
+      });
 
-        // Disable the form
-        this.signUpForm.disable();
-
-        // Hide the alert
-        this.showAlert = false;
-
-        // Sign up
-        this._authService.signUp(this.signUpForm.value)
-            .subscribe(
-                (response) => {
-
-                    // Navigate to the confirmation required page
-                    this._router.navigateByUrl('/confirmation-required');
-                },
-                (response) => {
-
-                    // Re-enable the form
-                    this.signUpForm.enable();
-
-                    // Reset the form
-                    this.signUpNgForm.resetForm();
-
-                    // Set the alert
-
-                    // Show the alert
-                    this.showAlert = true;
-                }
-            );
+      // Navigate to the confirmation required page
+      this.submitted = false;
+      this._router.navigateByUrl('/confirmation-required');
     }
+    else
+    {
+      this.setupErrorMessage(response);
+      this.signUpForm.enable();
+      this.signUpNgForm.resetForm();
+    }
+  }
+
+  onReceiveError = (error: any): void =>
+  {
+    this.submitted = false;
+    this.signUpForm.enable();
+    this.signUpNgForm.resetForm();
+    this.setupErrorMessage(error);
+  }
+
+  showAgreeTerms(): void
+  {
+    this.agreeTermsVisible = true;
+  }
+
+  private setupErrorMessage = (error: any): void =>
+  {
+    let serverError: string = ExceptionUtils.getServerErrorMessage(error,
+      MessageConstants.ERROR.loginFailed.detail);
+
+    this.signUpMessages = [
+      {
+        severity: 'error',
+        summary: StringUtils.empty(),
+        detail: serverError,
+      }
+    ]
+  }
+
 }

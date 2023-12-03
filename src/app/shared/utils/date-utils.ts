@@ -1,5 +1,7 @@
-class DateUtils {
-  static formatDate(date: Date): string {
+class DateUtils
+{
+  static formatDate(date: Date): string
+  {
     return date.toLocaleDateString();
   }
 }

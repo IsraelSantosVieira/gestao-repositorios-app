@@ -1,48 +1,146 @@
 <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
-    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
-        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
-            <!-- Logo -->
-            <img
-              src="assets/images/logo.png"
-              class="w-30"
-              alt="Logo image">
+  <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+    <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+      <!-- Logo -->
+      <img
+        src="assets/images/logo.png"
+        class="w-30"
+        alt="Logo image">
 
-            <!-- Title -->
-            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Cadastrar</div>
-            <div class="flex items-baseline mt-0.5 font-medium">
-                <div>Você já tem uma conta?</div>
-                <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-in']">Entrar
-                </a>
-            </div>
+      <!-- Title -->
+      <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Cadastrar</div>
+      <div class="flex items-baseline mt-0.5 font-medium">
+        <div>Você já tem uma conta?</div>
+        <a
+            class="ml-1 text-primary-500 hover:underline"
+            [routerLink]="['/sign-in']">Entrar
+        </a>
+      </div>
 
-            <!-- Alert -->
+      <!-- Alerts -->
+      <p-messages [(value)]="signUpMessages"
+                  [enableService]="false"
+                  [closable]="true">
+      </p-messages>
+      <p-dialog header="Termos de uso"
+                [(visible)]="agreeTermsVisible"
+                [breakpoints]="{ '960px': '75vw' }"
+                [style]="{ width: '50vw' }"
+                [draggable]="false"
+                [resizable]="false">
+        <iframe src="assets/agreeTerms.html"
+                style="width: 100%; height: 400px; border: none;">
+        </iframe>
+      </p-dialog>
 
-            <!-- Sign Up form -->
-            <form
-                class="mt-8"
-                [formGroup]="signUpForm"
-                #signUpNgForm="ngForm">
+      <!-- Sign Up form -->
+      <form
+        class="mt-8 flex flex-col"
+        [formGroup]="signUpForm"
+        #signUpNgForm="ngForm">
 
-                <!-- Name field -->
-
-
-                <!-- Email field -->
-
-
-                <!-- Password field -->
-
-                <!-- Company field -->
-
-                <!-- ToS and PP -->
-                <div class="inline-flex items-end w-full mt-1.5">
-
-                </div>
-
-                <!-- Submit button -->
-
-            </form>
+        <!-- Email field -->
+        <div class="mt-4 flex flex-col">
+            <span class="p-float-label">
+              <input pInputText
+                     id="email"
+                     formControlName="email"
+                     class="mr-2 w-full"/>
+              <label for="email">Email</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="signUpForm.get('email')?.invalid && submitted">
+          </p-message>
         </div>
+
+        <!-- Password field -->
+        <app-create-password class="mt-6"
+                             [formGroup]="signUpForm">
+        </app-create-password>
+
+        <!-- Name field -->
+        <div class="mt-6 flex flex-col">
+            <span class="p-float-label">
+              <input pInputText
+                     id="firstName"
+                     formControlName="firstName"
+                     class="mr-2 w-full"/>
+              <label for="email">Nome</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="signUpForm.get('firstName')?.invalid && submitted">
+          </p-message>
+        </div>
+
+        <!-- Last name field -->
+        <div class="mt-6 flex flex-col">
+            <span class="p-float-label">
+              <input pInputText
+                     id="lastName"
+                     formControlName="lastName"
+                     class="mr-2 w-full"/>
+              <label for="email">Sobrenome</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="signUpForm.get('lastName')?.invalid && submitted">
+          </p-message>
+        </div>
+
+        <!-- Phone field -->
+        <div class="mt-6 flex flex-col">
+            <span class="p-float-label">
+              <p-inputMask mask="(99) 99999-9999"
+                           id="phone"
+                           formControlName="phone"
+                           class="w-full"
+                           placeholder="(99) 99999-9
+                           999"
+                           [style]="{'width': '100%'}">
+              </p-inputMask>
+              <label for="phone">Telefone</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="signUpForm.get('phone')?.invalid && submitted">
+          </p-message>
+        </div>
+
+        <!-- ToS and PP -->
+        <div class="inline-flex items-end justify-between w-full mt-6">
+          <div>
+            <p-checkbox formControlName="agreements"
+                        inputId="agreements"
+                        [binary]="true">
+            </p-checkbox>
+            <label class="ml-2" for="agreements">Concordo com os</label>
+            <a
+              class="ml-1 text-blue-800 hover:underline cursor-pointer"
+              (click)="showAgreeTerms()">termos de uso
+            </a>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+
+        <app-async-button
+          class="mt-8"
+          [label]="'Cadastrar'"
+          [asyncCall]="signUp"
+          [onReceiveData]="onReceiveResult"
+          [onReceiveError]="onReceiveError"
+          [disabled]="signUpForm.invalid || submitted"
+        ></app-async-button>
+      </form>
     </div>
+  </div>
+  <app-project-info class="relative hidden md:flex flex-auto items-center justify-center w-1/2
+        h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l rounded-2xl shadow">
+  </app-project-info>
 </div>

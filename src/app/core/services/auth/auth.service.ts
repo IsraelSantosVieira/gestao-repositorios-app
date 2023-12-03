@@ -4,9 +4,12 @@ import {AuthUtils} from 'app/core/auth/auth.utils';
 import {UserService} from 'app/core/services/auth/user.service';
 import {catchError, Observable, of, switchMap, throwError} from 'rxjs';
 import {environment} from '../../../../environments/environment';
-import {AuthenticateResult} from '../../models/authenticate-result.types';
-import {Response} from 'app/core/models/response.types';
+import {AuthenticateResult} from 'app/core/models/user/authenticate-result.types';
+import {Response} from 'app/core/models/base/response.types';
 import {ApiRoute} from 'app/core/models/enums/api-route.types';
+import ExceptionUtils from 'app/shared/utils/exception-utils';
+import { LogService } from 'app/core/services/debug/log.service';
+import { CreateUser } from 'app/core/models/user/create-user.types';
 
 @Injectable({providedIn: 'root'})
 export class AuthService
@@ -19,6 +22,7 @@ export class AuthService
     constructor(
         private _httpClient: HttpClient,
         private _userService: UserService,
+        private _logService: LogService
     )
     {
     }
@@ -112,22 +116,22 @@ export class AuthService
         return this._httpClient.post<Response<AuthenticateResult>>(uri, data).pipe(
           switchMap((response: Response<AuthenticateResult>) =>
           {
-              // Store the access token in the local storage
-              this.accessToken = response.data.accessToken;
-              this.refreshToken = response.data.refreshToken;
-              this.userEmail = response.data.user?.email;
+            // Store the access token in the local storage
+            this.accessToken = response.data.accessToken;
+            this.refreshToken = response.data.refreshToken;
+            this.userEmail = response.data.user?.email;
 
-              // Set the authenticated flag to true
-              this._authenticated = true;
+            // Set the authenticated flag to true
+            this._authenticated = true;
 
-              // Store the user on the user service
-              this._userService.user = response.data.user;
+            // Store the user on the user service
+            this._userService.user = response.data.user;
 
-              // Return a new observable with the response
-              return of(response);
+            // Return a new observable with the response
+            return of(response);
           }),
-          catchError((error) => {
-            throw new Error(error);
+          catchError((error: any) => {
+            return throwError(error);
           }),
         );
     }
@@ -146,7 +150,7 @@ export class AuthService
         // Sign in using the token
         const uri = environment.getEnvironmentUri('/connect/auth', ApiRoute.Identity);
         return this._httpClient.post<Response<AuthenticateResult>>(uri, data).pipe(
-            catchError(() => of()),
+            catchError(error => ExceptionUtils.createServerException(error, this._logService)),
             switchMap((response: Response<AuthenticateResult>) =>
             {
                 if ( !response.success )
@@ -194,9 +198,11 @@ export class AuthService
      *
      * @param user
      */
-    signUp(user: { name: string; email: string; password: string; company: string }): Observable<any>
+    signUp(user: CreateUser): Observable<any>
     {
-        return this._httpClient.post('api/auth/sign-up', user);
+      const uri = environment.getEnvironmentUri('/users-app', ApiRoute.Client);
+      return this._httpClient.post(uri, user).pipe(
+        catchError(error => ExceptionUtils.createServerException(error, this._logService)));
     }
 
     /**

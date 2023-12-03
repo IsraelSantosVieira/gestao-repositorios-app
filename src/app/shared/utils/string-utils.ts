@@ -1,6 +1,17 @@
 class StringUtils {
+
+  static empty(): string
+  {
+    return '';
+  }
+
   static isNullOrEmpty(str: string | null): boolean {
     return !str || str.trim().length === 0;
+  }
+
+  static stringToBool(str: string | null): boolean {
+    return str != null && str.length > 0 &&
+      str.toLowerCase() === 'true';
   }
 
   static capitalizeFirstLetter(str: string): string {

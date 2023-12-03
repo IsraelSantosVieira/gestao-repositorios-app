@@ -14,6 +14,7 @@ export class AsyncButtonComponent implements OnDestroy {
 
   @Input() asyncCall: (() => Observable<any>) | undefined;
   @Input() onReceiveData: ((data: any) => void) | undefined;
+  @Input() onReceiveError: ((error: any) => void) | undefined;
 
   @Input() loadingIcon: string | undefined;
   @Input() rounded: boolean = false;
@@ -28,20 +29,23 @@ export class AsyncButtonComponent implements OnDestroy {
 
   protected _onClick(): void
   {
-    if(this.asyncCall) {
-      this._loading = true;
+    if( this.asyncCall )
+    {
       this.asyncCall()
         .pipe(
-          takeUntil(this._destroy$),
           finalize((): boolean => this._loading = false))
         .subscribe((response): void =>
         {
-          if(this.onReceiveData)
+          if ( this.onReceiveData )
           {
             this.onReceiveData(response);
           }
-        }
-      );
+        }, (error): void => {
+          if ( this.onReceiveError )
+          {
+            this.onReceiveError(error);
+          }
+        });
     }
     else
     {

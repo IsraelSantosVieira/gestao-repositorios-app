@@ -3,10 +3,10 @@ import {Injectable} from '@angular/core';
 import {AuthUtils} from 'app/core/auth/auth.utils';
 import {UserService} from 'app/core/services/auth/user.service';
 import {catchError, Observable, of, switchMap, throwError} from 'rxjs';
-import {environment} from "../../../../environments/environment";
-import {AuthenticateResult} from "../../models/authenticate-result.types";
-import {Response} from "app/core/models/response.types";
-import {ApiRoute} from "app/core/models/enums/api-route.types";
+import {environment} from '../../../../environments/environment';
+import {AuthenticateResult} from '../../models/authenticate-result.types';
+import {Response} from 'app/core/models/response.types';
+import {ApiRoute} from 'app/core/models/enums/api-route.types';
 
 @Injectable({providedIn: 'root'})
 export class AuthService
@@ -102,32 +102,33 @@ export class AuthService
             return throwError('User is already logged in.');
         }
 
-        const data = {
+        const data: any = {
             ...credentials,
-            grantType: 'password',
-            scope: 'Website'
+            grantType: 'password'
         }
 
         const uri = environment.getEnvironmentUri('/connect/auth', ApiRoute.Identity);
 
-        return this._httpClient.post(uri, data).pipe(
-            // @ts-ignore
-            switchMap((response: Response<AuthenticateResult>) =>
-            {
-                // Store the access token in the local storage
-                this.accessToken = response.data.accessToken;
-                this.refreshToken = response.data.refreshToken;
-                this.userEmail = response.data.user?.email;
+        return this._httpClient.post<Response<AuthenticateResult>>(uri, data).pipe(
+          switchMap((response: Response<AuthenticateResult>) =>
+          {
+              // Store the access token in the local storage
+              this.accessToken = response.data.accessToken;
+              this.refreshToken = response.data.refreshToken;
+              this.userEmail = response.data.user?.email;
 
-                // Set the authenticated flag to true
-                this._authenticated = true;
+              // Set the authenticated flag to true
+              this._authenticated = true;
 
-                // Store the user on the user service
-                this._userService.user = response.data.user;
+              // Store the user on the user service
+              this._userService.user = response.data.user;
 
-                // Return a new observable with the response
-                return of(response);
-            }),
+              // Return a new observable with the response
+              return of(response);
+          }),
+          catchError((error) => {
+            throw new Error(error);
+          }),
         );
     }
 
@@ -137,28 +138,17 @@ export class AuthService
     signInUsingToken(): Observable<any>
     {
         const data = {
-            email: this.userEmail,
-            grantType: 'refresh_token',
-            scope: 'Website',
-            refreshToken: this.refreshToken
+          email: this.userEmail,
+          refreshToken: this.refreshToken,
+          grantType: 'refresh_token'
         }
 
         // Sign in using the token
         const uri = environment.getEnvironmentUri('/connect/auth', ApiRoute.Identity);
-        return this._httpClient.post(uri, data).pipe(
-            // @ts-ignore
-            catchError(() =>
-                of(false),
-            ),
+        return this._httpClient.post<Response<AuthenticateResult>>(uri, data).pipe(
+            catchError(() => of()),
             switchMap((response: Response<AuthenticateResult>) =>
             {
-                // Replace the access token with the new one if it's available on
-                // the response object.
-                //
-                // This is an added optional step for better security. Once you sign
-                // in using the token, you should generate a new one on the server
-                // side and attach it to the response object. Then the following
-                // piece of code can replace the token with the refreshed one.
                 if ( !response.success )
                 {
                      return of(false);
@@ -191,7 +181,6 @@ export class AuthService
         // Remove the access token and refresh token from the local storage
         localStorage.removeItem(environment.localStore.accessToken);
         localStorage.removeItem(environment.localStore.refreshToken);
-        localStorage.removeItem(environment.localStore.userEmail);
 
         // Set the authenticated flag to false
         this._authenticated = false;

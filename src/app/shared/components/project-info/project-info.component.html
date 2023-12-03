@@ -1,0 +1,54 @@
+<div class="z-10 relative w-full max-w-2xl">
+  <div class="text-7xl font-bold leading-none text-gray-100">
+    <div>Bem-vindo ao</div>
+    <div>{{appConfig.appName}}</div>
+  </div>
+  <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
+    Essa aplicação educacional tem como objetivo construir um ambiente integrado para professores e alunos
+    compartilharem repositórios de trabalhos acadêmicos e científicos.
+  </div>
+  <div class="flex flex-col items-start mt-8">
+    <!-- Background - @formatter:off -->
+    <!-- Background -->
+    <img class="absolute pointer-events-none"
+         style="top: -100%; left: -100%; opacity: 0.03"
+         src="assets/images/background-2.png"
+    />
+
+    <!-- @formatter:on -->
+    <!-- Separator -->
+    <div class="flex flex-col items-center mt-8">
+      <div class="text-white">Conheça mais sobre o projeto</div>
+      <div class="ml-2 mt-1 text-gray-400">Criado por Israel Santos Vieira</div>
+    </div>
+
+    <!-- Single sign-on buttons -->
+    <div class="flex items-center mt-8 space-x-4">
+      <p-button icon="pi pi-github"
+                [rounded]="true"
+                [raised]="true"
+                severity="secondary"
+                (onClick)="goToAppPage()">
+      </p-button>
+      <p-button icon="pi pi-database"
+                [rounded]="true"
+                [raised]="true"
+                severity="secondary"
+                (onClick)="goToApiPage()">
+      </p-button>
+      <p-button icon="pi pi-linkedin"
+                [rounded]="true"
+                [raised]="true"
+                severity="secondary"
+                (onClick)="goToLinkedInPage()">
+      </p-button>
+      <p-button icon="pi pi-prime"
+                [rounded]="true"
+                [raised]="true"
+                severity="secondary"
+                (onClick)="goToPrimePage()">
+      </p-button>
+    </div>
+  </div>
+</div>
+

@@ -1,6 +1,4 @@
 import { ViewModel } from 'app/core/models/base/view-model.types';
-import StringUtils from 'app/shared/utils/string-utils';
-import ArrayUtils from 'app/shared/utils/array-utils';
 
 class ObjectUtils
 {
@@ -25,6 +23,19 @@ class ObjectUtils
     }
 
     throw new Error(`Propriedade '${prop.toString()}' não encontrada no objeto.`);
+  }
+
+  static propIsNull<T extends Object, K extends keyof T>( obj: T, prop: K ): boolean
+  {
+    try
+    {
+      const propValue: T[K] = ObjectUtils.getPropValue(obj, prop);
+      return propValue == null;
+    }
+    catch (error: any)
+    {
+      return true;
+    }
   }
 
   static deepClone<T>(obj: T): T

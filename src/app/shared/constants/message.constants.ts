@@ -24,6 +24,18 @@ export default class MessageConstants
     client: {
       summary: 'Erro no cliente',
       detail: 'Ocorreu um erro no cliente. Por favor, tente novamente.'
+    },
+    accountActivated: {
+      summary: 'Ativação falhou',
+      detail: 'Ocorreu um erro na ativação da sua conta, tente novamente.'
+    },
+    passwordRecovery: {
+      summary: 'Recuperação Falhou',
+      detail: 'Algo deu errado ao recuperar sua senha.'
+    },
+    passwordReset: {
+      summary: 'Redefinição Falhou',
+      detail: 'Algo deu errado na redefinição da sua senha.'
     }
   };
 
@@ -36,6 +48,10 @@ export default class MessageConstants
       summary: 'Sessão Expirada',
       detail: 'Sua sessão expirou. Por favor, faça login novamente.'
     },
+    resendCodeDelay: {
+      summary: 'Aguarde um instante',
+      detail: 'Espere antes de enviar uma nova requisição.'
+    },
   };
 
   static readonly SUCCESS = {
@@ -45,11 +61,27 @@ export default class MessageConstants
     },
     accountCreated: {
       summary: 'Conta Criada',
-      detail: 'Sua conta foi criada com sucesso! Bem-vindo(a)!'
+      detail: 'Sua conta foi criada com sucesso!'
+    },
+    accountActivated: {
+      summary: 'Conta Ativada',
+      detail: 'Sua conta foi ativada com sucesso! Bem-vindo(a)!'
     },
     dataSaved: {
       summary: 'Dados Salvos',
       detail: 'As alterações foram salvas com sucesso.'
+    },
+    resendCode: {
+      summary: 'Código enviado',
+      detail: 'Um novo código foi enviado para o seu email.'
+    },
+    passwordRecovery: {
+      summary: 'Recuperação solicitada',
+      detail: 'Sua recuperação de senha foi solicitada com sucesso!'
+    },
+    passwordReset: {
+      summary: 'Senha alterada',
+      detail: 'Sua senha foi alterada com sucesso!'
     },
   };
 

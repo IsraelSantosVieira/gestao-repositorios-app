@@ -1,9 +1,17 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { catchError, finalize, Observable, of } from 'rxjs';
 import { AuthService } from 'app/core/services/auth/auth.service';
 import {baseAnimations} from "../../../shared/modules/animations";
 import {BaseValidators} from "../../../shared/modules/validators";
+import { Message } from "primeng/api";
+import ExceptionUtils from "../../../shared/utils/exception-utils";
+import { LogService } from "../../../core/services/debug/log.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import { LogLevel } from "../../../core/models/enums/log-level.types";
+import MessageConstants from "../../../shared/constants/message.constants";
+import StringUtils from "../../../shared/utils/string-utils";
+import UrlUtils from "../../../shared/utils/url-utils";
 
 @Component({
     selector     : 'auth-reset-password',
@@ -16,14 +24,18 @@ export class AuthResetPasswordComponent implements OnInit
     @ViewChild('resetPasswordNgForm') resetPasswordNgForm!: NgForm
 
     resetPasswordForm!: UntypedFormGroup;
-    showAlert: boolean = false;
+    messages: Message[] = [];
+    submitted: boolean = false;
 
     /**
      * Constructor
      */
     constructor(
         private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder
+        private _formBuilder: UntypedFormBuilder,
+        private _logService: LogService,
+        private _router: Router,
+        private _route: ActivatedRoute
     )
     {
     }
@@ -37,15 +49,28 @@ export class AuthResetPasswordComponent implements OnInit
      */
     ngOnInit(): void
     {
-        // Create the form
         this.resetPasswordForm = this._formBuilder.group({
-                password       : ['', Validators.required],
-                passwordConfirm: ['', Validators.required]
+                code              : ['', Validators.required],
+                email             : ['', Validators.required, Validators.email],
+                newPassword       : ['', Validators.required, Validators.minLength(3)],
+                passwordConfirm   : ['', Validators.required, Validators.minLength(3)]
             },
             {
-                validators: BaseValidators.mustMatch('password', 'passwordConfirm')
+                validators: BaseValidators.mustMatch('newPassword', 'passwordConfirm')
             }
         );
+
+        this._route.params.subscribe((params: any): void =>
+        {
+            const email = params.email;
+            if (!StringUtils.isNullOrEmpty(email))
+            {
+                this.resetPasswordForm.patchValue({
+                    ...this.resetPasswordForm.value,
+                    email
+                })
+            }
+        })
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -55,44 +80,64 @@ export class AuthResetPasswordComponent implements OnInit
     /**
      * Reset password
      */
-    resetPassword(): void
+    resetPassword = (): Observable<any> =>
     {
-        // Return if the form is invalid
+        this.submitted = true;
+
         if ( this.resetPasswordForm.invalid )
         {
-            return;
+            return of(null);
         }
 
-        // Disable the form
         this.resetPasswordForm.disable();
+        this.messages = [];
 
-        // Hide the alert
-        this.showAlert = false;
+        return this._authService.resetPassword(this.resetPasswordForm.value).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService))
+        );
+    }
 
-        // Send the request to the server
-        this._authService.resetPassword(this.resetPasswordForm.get('password')?.value)
-            .pipe(
-                finalize(() => {
+    onReceiveResult = (response: any): void =>
+    {
+        this.submitted = false;
 
-                    // Re-enable the form
-                    this.resetPasswordForm.enable();
+        if ( UrlUtils.validateServerResponse(response) )
+        {
+            this._logService.createMessage({
+                logLevel: LogLevel.Success,
+                summary: MessageConstants.SUCCESS.passwordReset.summary,
+                message: MessageConstants.SUCCESS.passwordReset.detail
+            });
 
-                    // Reset the form
-                    this.resetPasswordNgForm.resetForm();
+            this._router.navigateByUrl('/sign-in');
+        }
+        else
+        {
+            this.setupErrorMessage(response);
+            this.resetPasswordForm.enable();
+            this.resetPasswordNgForm.resetForm();
+        }
+    }
 
-                    // Show the alert
-                    this.showAlert = true;
-                })
-            )
-            .subscribe(
-                (response) => {
+    onReceiveError = (error: any): void =>
+    {
+        this.resetPasswordForm.enable();
+        this.resetPasswordNgForm.resetForm();
+        this.submitted = false;
+        this.setupErrorMessage(error);
+    }
 
-                    // Set the alert
-                },
-                (response) => {
+    private setupErrorMessage = (error: any): void =>
+    {
+        let serverError: string = ExceptionUtils.getServerErrorMessage(error,
+            MessageConstants.ERROR.passwordReset.detail);
 
-                    // Set the alert
-                }
-            );
+        this.messages = [
+            {
+                severity: 'error',
+                summary: StringUtils.empty(),
+                detail: serverError,
+            }
+        ]
     }
 }

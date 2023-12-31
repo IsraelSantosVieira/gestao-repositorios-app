@@ -10,21 +10,47 @@
       <!-- Title -->
       <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Confirmação necessária</div>
       <div class="mt-4">
-          Um e-mail de confirmação com instruções foi enviado para seu endereço de e-mail.
-          Siga essas instruções para confirmar seu cadastro e ativar sua conta.
+          Um e-mail de confirmação com um código de verificação foi enviado para seu endereço de e-mail.
+          Digite o código de confirmação abaixo para ativar sua conta.
       </div>
 
       <!-- Form footer -->
-      <div class="mt-8 font-medium text-secondary">
-        <span>Já confirmou?</span>
-        <a
-            class="ml-1 text-primary-500 hover:underline"
-            [routerLink]="['/sign-in']">Entrar
-        </a>
+      <div class="mt-8 font-medium text-secondary flex justify-center items-center"
+           [formGroup]="confirmForm" #confirmNgForm="ngForm">
+
+        <!-- Code field -->
+        <div class="flex flex-col">
+            <span class="p-float-label">
+              <p-inputMask mask="9  9  9  9"
+                           id="code"
+                           formControlName="code"
+                           class="mr-2 w-full"
+                           placeholder="9  9  9  9"
+                           [style]="{'width': '100%'}">
+              </p-inputMask>
+              <label for="code">Código</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="confirmForm.get('code')?.invalid && submitted">
+          </p-message>
+        </div>
+
+      <app-async-button
+          class="ml-2"
+          [label]="'pi pi-check'"
+          [useLabelIcon]="true"
+          [asyncCall]="confirmActivationCode"
+          [onReceiveData]="onReceiveActiveSuccess"
+          [onReceiveError]="onReceiveActiveError"
+          [disabled]="confirmForm.invalid || submitted"
+      ></app-async-button>
+
       </div>
       <div class="mt-8 font-medium text-secondary">
         <span>Não recebeu o email?</span>
-        <a
+        <a (click)="resendActivationCode()"
           class="ml-1 text-blue-800 hover:underline cursor-pointer">
           Reenviar
         </a>

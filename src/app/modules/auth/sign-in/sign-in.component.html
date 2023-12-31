@@ -77,9 +77,16 @@
                           inputId="remember"
                           [binary]="true">
               </p-checkbox>
-              <label class="ml-2" for="remember">Lembrar?</label>
+              <label class="ml-2">Lembrar credenciais?</label>
             </div>
           </div>
+
+            <div class="flex justify-start items-center mt-1.5 font-medium">
+                <a
+                    class="mt-2 text-primary-500 hover:underline"
+                    [routerLink]="['/forgot-password']">Esqueceu sua senha?
+                </a>
+            </div>
 
           <!-- Submit button -->
           <app-async-button

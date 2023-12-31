@@ -13,6 +13,7 @@ import PatternConstants from 'app/shared/constants/pattern.constants';
 import { MessageInfo } from 'app/core/models/base/message-info.types';
 import { LogService } from 'app/core/services/debug/log.service';
 import { LogLevel } from 'app/core/models/enums/log-level.types';
+import UrlUtils from "../../../shared/utils/url-utils";
 
 @Component({
     selector     : 'auth-sign-up',
@@ -94,7 +95,7 @@ export class AuthSignUpComponent implements OnInit
 
   onReceiveResult = (response: any): void =>
   {
-    if ( response.success )
+    if ( UrlUtils.validateServerResponse(response) )
     {
       this._logService.createMessage({
         logLevel: LogLevel.Success,

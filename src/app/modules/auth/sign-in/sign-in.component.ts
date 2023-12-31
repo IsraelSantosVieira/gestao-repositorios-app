@@ -11,6 +11,8 @@ import { LogService } from 'app/core/services/debug/log.service';
 import StringUtils from 'app/shared/utils/string-utils';
 import ExceptionUtils from 'app/shared/utils/exception-utils';
 import { LogLevel } from 'app/core/models/enums/log-level.types';
+import { User } from "../../../core/models/user/user.types";
+import UrlUtils from "../../../shared/utils/url-utils";
 
 @Component({
     selector     : 'auth-sign-in',
@@ -106,7 +108,7 @@ export class AuthSignInComponent implements OnInit
   {
     this.submitted = false;
 
-    if ( response?.success )
+    if ( UrlUtils.validateServerResponse(response) )
     {
       this._logService.createMessage({
         logLevel: LogLevel.Success,
@@ -114,9 +116,18 @@ export class AuthSignInComponent implements OnInit
         message: MessageConstants.SUCCESS.loginSuccess.detail
       });
 
-      const redirectURL = this._activatedRoute.snapshot
+      let redirectURL = this._activatedRoute.snapshot
         .queryParamMap.get('redirectURL') || '/signed-in-redirect';
 
+      const user: User = response?.data?.user;
+      this._logService.debug(user);
+
+      if (user?.pendingRegisterInformation)
+      {
+        redirectURL = '/confirmation-required';
+      }
+
+      this._logService.debug('Redirect: ' + redirectURL);
       this._router.navigateByUrl(redirectURL);
     }
     else

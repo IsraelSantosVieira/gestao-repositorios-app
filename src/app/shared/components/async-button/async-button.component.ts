@@ -9,6 +9,7 @@ import { finalize, Observable, Subject, takeUntil } from 'rxjs';
 export class AsyncButtonComponent implements OnDestroy {
 
   @Input() label: string = 'Button';
+  @Input() useLabelIcon: boolean = false;
   @Input() size: 'small' | 'large' | undefined;
   @Input() severity: string = 'primary';
 

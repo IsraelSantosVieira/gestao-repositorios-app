@@ -11,6 +11,7 @@ export class CreatePasswordComponent
 {
   @Input() formControlName: string = 'password';
   @Input() formGroup!: UntypedFormGroup;
+  @Input() placeholder: string = 'Senha';
 
   protected readonly PasswordUtils = PasswordUtils;
 }

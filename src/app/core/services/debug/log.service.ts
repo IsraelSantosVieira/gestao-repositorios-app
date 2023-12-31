@@ -17,6 +17,7 @@ export class LogService {
 
   private readonly consoleLogIsEnabled: boolean = false;
   private readonly currentLogLevel: LogLevel = LogLevel.Debug;
+  private readonly messageLifetime: number = 4;
 
   constructor(private _messageService: MessageService)
   {
@@ -68,6 +69,7 @@ export class LogService {
     this._messageService.add(
       {
         severity: 'success',
+        life: this.messageLifetime,
         summary: summary,
         detail: message
       });
@@ -78,6 +80,7 @@ export class LogService {
     this._messageService.add(
       {
         severity: 'error',
+        life: this.messageLifetime,
         summary: summary,
         detail: message
       });
@@ -93,6 +96,7 @@ export class LogService {
     this._messageService.add(
       {
         severity: 'error',
+        life: this.messageLifetime,
         summary: summary,
         detail: message
       });
@@ -108,6 +112,7 @@ export class LogService {
     this._messageService.add(
       {
         severity: 'warn',
+        life: this.messageLifetime,
         summary: summary,
         detail: message
       });
@@ -123,6 +128,7 @@ export class LogService {
     this._messageService.add(
       {
         severity: 'info',
+        life: this.messageLifetime,
         summary: summary,
         detail: message
       });
@@ -133,11 +139,12 @@ export class LogService {
     }
   }
 
-  debug(exception: string): void
+  debug(exception: any): void
   {
     this._messageService.add(
       {
         severity: 'warn',
+        life: this.messageLifetime,
         summary: 'DEBUG',
         detail: this.getObjectLog(exception)
       });

@@ -15,6 +15,7 @@ import { CreateUser } from 'app/core/models/user/create-user.types';
 export class AuthService
 {
     private _authenticated: boolean = false;
+    private _needConfirmation: boolean = false;
 
     /**
      * Constructor
@@ -64,11 +65,6 @@ export class AuthService
         return localStorage.getItem(environment.localStore.userEmail) ?? '';
     }
 
-    get apiUrl(): string
-    {
-        return environment.apiUrl;
-    }
-
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -80,17 +76,20 @@ export class AuthService
      */
     forgotPassword(email: string): Observable<any>
     {
-        return this._httpClient.post('api/auth/forgot-password', email);
+        const uri = environment.getEnvironmentUri('/account/recover-password', ApiRoute.Identity);
+        return this._httpClient.post(uri, { email }).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService)));
     }
 
     /**
-     * Reset password
+     * Recovery password
      *
-     * @param password
      */
-    resetPassword(password: string): Observable<any>
+    resetPassword(credentials: { email: string; newPassword: string; passwordConfirm: string; code: string }): Observable<any>
     {
-        return this._httpClient.post('api/auth/reset-password', password);
+        const uri = environment.getEnvironmentUri('/account/reset-password', ApiRoute.Identity);
+        return this._httpClient.post(uri, credentials).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService)));
     }
 
     /**
@@ -123,6 +122,7 @@ export class AuthService
 
             // Set the authenticated flag to true
             this._authenticated = true;
+            this._needConfirmation = response.data.user?.pendingRegisterInformation;
 
             // Store the user on the user service
             this._userService.user = response.data.user;
@@ -167,12 +167,13 @@ export class AuthService
 
                 // Set the authenticated flag to true
                 this._authenticated = true;
+                this._needConfirmation = response.data.user?.pendingRegisterInformation;
 
                 // Store the user on the user service
                 this._userService.user = response.data.user;
 
-                // Return true
-                return of(true);
+                // Return result
+                return of(!this._needConfirmation);
             }),
         );
     }
@@ -188,6 +189,7 @@ export class AuthService
 
         // Set the authenticated flag to false
         this._authenticated = false;
+        this._needConfirmation = false;
 
         // Return the observable
         return of(true);
@@ -216,10 +218,38 @@ export class AuthService
     }
 
     /**
+     * Resend Activation code
+     *
+     */
+    resendActivationCode(email: string): Observable<any>
+    {
+        const uri = environment.getEnvironmentUri('/account/resend-activation-code', ApiRoute.Identity);
+        return this._httpClient.post(uri, { email }).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService)));
+    }
+
+    /**
+     * Active Account
+     *
+     * @param credentials
+     */
+    activeAccount(credentials: { email: string; code: string }): Observable<any>
+    {
+        const uri = environment.getEnvironmentUri('/account/user-activate', ApiRoute.Identity);
+        return this._httpClient.post(uri, credentials).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService)));
+    }
+
+    /**
      * Check the authentication status
      */
     check(): Observable<boolean>
     {
+        if ( this._needConfirmation )
+        {
+          return of(false);
+        }
+
         // Check if the user is logged in
         if ( this._authenticated )
         {

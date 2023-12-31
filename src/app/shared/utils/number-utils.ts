@@ -1,9 +1,12 @@
-class NumberUtils {
-  static isPositiveNumber(num: number): boolean {
+class NumberUtils
+{
+  static isPositiveNumber(num: number): boolean
+  {
     return num > 0;
   }
 
-  static isNumber(value: any): boolean {
+  static isNumber(value: any): boolean
+  {
     return typeof value === 'number' && !isNaN(value);
   }
 }

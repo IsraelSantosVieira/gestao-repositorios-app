@@ -1,5 +1,6 @@
 <p-button
-  [label]="label"
+  [label]="useLabelIcon ? '' : label"
+  [icon]="useLabelIcon ? label : ''"
   [loading]="_loading"
   [text]="textMode"
   [raised]="raisedMode"

@@ -1,4 +1,4 @@
-import {User} from "./user.types";
+import {User} from 'app/core/models/user/user.types';
 
 export interface AuthenticateResult
 {

@@ -5,5 +5,9 @@ export const authResetPasswordRoutes: Route[] = [
     {
         path     : '',
         component: AuthResetPasswordComponent
+    },
+    {
+        path     : ':email',
+        component: AuthResetPasswordComponent
     }
 ];

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from 'app/core/services/auth/auth.service';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { catchError, Observable, throwError } from 'rxjs';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor
@@ -30,7 +30,7 @@ export class AuthInterceptor implements HttpInterceptor
      * @param req
      * @param next
      */
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
+    intercept = (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> =>
     {
         // Clone the request object
         let newReq = req.clone();
@@ -42,9 +42,7 @@ export class AuthInterceptor implements HttpInterceptor
             });
         }
 
-        // Response
-        // @ts-ignore
-        return next(newReq).pipe(
+        return next.handle(newReq).pipe(
           catchError((error) =>
           {
               // Catch "401 Unauthorized" responses

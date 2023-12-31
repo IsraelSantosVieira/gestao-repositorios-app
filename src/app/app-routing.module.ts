@@ -5,7 +5,7 @@ import {LayoutComponent} from "./layout/layout.component";
 
 export const appRoutes: Routes = [
 
-  { path: '', pathMatch: "full", redirectTo: "home" },
+  { path: '', pathMatch: "full", redirectTo: "landing-page" },
 
   // Redirect signed in user to the landing page
   {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'landing-page'},

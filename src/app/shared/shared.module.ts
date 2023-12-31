@@ -3,10 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PrimeFullModule } from 'app/shared/prime/prime-full.module';
 import { AsyncButtonComponent } from 'app/shared/components/async-button/async-button.component';
+import { ProjectInfoComponent } from 'app/shared/components/project-info/project-info.component';
+import { CreatePasswordComponent } from 'app/shared/components/create-password/create-password.component';
 
 @NgModule({
     declarations: [
-      AsyncButtonComponent
+      AsyncButtonComponent,
+      ProjectInfoComponent,
+      CreatePasswordComponent
     ],
     imports: [
       CommonModule,
@@ -19,7 +23,9 @@ import { AsyncButtonComponent } from 'app/shared/components/async-button/async-b
       FormsModule,
       ReactiveFormsModule,
 
-      AsyncButtonComponent
+      AsyncButtonComponent,
+      ProjectInfoComponent,
+      CreatePasswordComponent
     ]
 })
 export class SharedModule

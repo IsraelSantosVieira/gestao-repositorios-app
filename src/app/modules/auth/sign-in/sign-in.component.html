@@ -1,56 +1,106 @@
 <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
-    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
-        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
-            <!-- Logo -->
-            <img
-              src="assets/images/logo.png"
-              class="w-100"
-              alt="Logo image">
+  <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+      <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+        <!-- Logo -->
+        <img
+          src="assets/images/logo.png"
+          class="w-30"
+          alt="Logo image">
 
-            <!-- Title -->
-            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Entrar</div>
-            <div class="flex items-baseline mt-0.5 font-medium">
-                <div>Não tem uma conta?</div>
+        <!-- Title -->
+        <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Entrar</div>
+        <div class="flex items-baseline mt-0.5 font-medium">
+          <div>Não tem uma conta?</div>
+          <a
+            class="ml-1 text-primary-500 hover:underline"
+            [routerLink]="['/sign-up']">Cadastrar
+          </a>
+        </div>
+
+        <!-- Alerts -->
+        <p-messages [(value)]="signInMessages"
+                    [enableService]="false"
+                    [closable]="true">
+        </p-messages>
+
+        <!-- Sign in form -->
+        <form
+          class="mt-8 flex flex-col"
+          [formGroup]="signInForm"
+          #signInNgForm="ngForm">
+
+          <!-- Email field -->
+          <div class="mt-4 flex flex-col">
+            <span class="p-float-label">
+              <input pInputText
+                     id="email"
+                     formControlName="email"
+                     class="mr-2 w-full"/>
+              <label for="email">Email</label>
+            </span>
+            <p-message class="w-full mt-2"
+                       severity="error"
+                       text="Obrigatório"
+                       *ngIf="signInForm.get('email')?.invalid && submitted">
+            </p-message>
+          </div>
+
+          <!-- Password field -->
+          <div class="mt-6 flex flex-col">
+            <span class="p-float-label w-full">
+              <p-password id="password"
+                          formControlName="password"
+                          [style]="{'width': '100%'}"
+                          [inputStyle]="{'width': '100%'}"
+                          [toggleMask]="true"
+                          [feedback]="false"
+                          class="w-full"
+                          styleClass="
+                            p-password
+                            p-component
+                            p-inputwrapper
+                            p-input-icon-right">
+              </p-password>
+              <label for="password">Senha</label>
+            </span>
+            <p-message class="w-full mt-2"
+                       severity="error"
+                       text="Obrigatório"
+                       *ngIf="signInForm.get('password')?.invalid && submitted">
+            </p-message>
+          </div>
+
+          <!-- Actions -->
+          <div class="inline-flex items-end justify-between w-full mt-6">
+            <div>
+              <p-checkbox formControlName="rememberMe"
+                          inputId="remember"
+                          [binary]="true">
+              </p-checkbox>
+              <label class="ml-2">Lembrar credenciais?</label>
+            </div>
+          </div>
+
+            <div class="flex justify-start items-center mt-1.5 font-medium">
                 <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-up']">Cadastrar
+                    class="mt-2 text-primary-500 hover:underline"
+                    [routerLink]="['/forgot-password']">Esqueceu sua senha?
                 </a>
             </div>
 
-            <!-- Alert -->
-
-            <!-- Sign in form -->
-            <form
-                class="mt-8"
-                [formGroup]="signInForm"
-                #signInNgForm="ngForm">
-
-                <!-- Email field -->
-
-                <!-- Password field -->
-
-                <!-- Actions -->
-                <div class="inline-flex items-end justify-between w-full mt-1.5">
-
-                </div>
-
-                <!-- Submit button -->
-                <app-async-button
-                  label="Entrar"
-                ></app-async-button>
-
-                <!-- Separator -->
-                <div class="flex items-center mt-8">
-                    <div class="flex-auto mt-px border-t"></div>
-                    <div class="mx-2 text-secondary">Visite as redes sociais</div>
-                    <div class="flex-auto mt-px border-t"></div>
-                </div>
-
-                <!-- Single sign-on buttons -->
-                <div class="flex items-center mt-8 space-x-4">
-
-                </div>
-            </form>
-        </div>
-    </div>
+          <!-- Submit button -->
+          <app-async-button
+            class="mt-8"
+            [label]="'Entrar'"
+            [asyncCall]="signIn"
+            [onReceiveData]="onReceiveAuthResult"
+            [onReceiveError]="onReceiveAuthError"
+            [disabled]="signInForm.invalid || submitted"
+          ></app-async-button>
+        </form>
+      </div>
+  </div>
+  <app-project-info class="relative hidden md:flex flex-auto items-center justify-center w-1/2
+        h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l rounded-2xl shadow">
+  </app-project-info>
 </div>

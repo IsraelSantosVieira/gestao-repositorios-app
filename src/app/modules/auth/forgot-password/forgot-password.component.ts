@@ -1,8 +1,15 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, NgForm, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 import { AuthService } from 'app/core/services/auth/auth.service';
 import {baseAnimations} from "../../../shared/modules/animations";
+import { Message } from "primeng/api";
+import ExceptionUtils from "../../../shared/utils/exception-utils";
+import { LogService } from "../../../core/services/debug/log.service";
+import { LogLevel } from "../../../core/models/enums/log-level.types";
+import MessageConstants from "../../../shared/constants/message.constants";
+import { Router } from "@angular/router";
+import UrlUtils from "../../../shared/utils/url-utils";
 
 @Component({
     selector     : 'auth-forgot-password',
@@ -15,14 +22,17 @@ export class AuthForgotPasswordComponent implements OnInit
     @ViewChild('forgotPasswordNgForm') forgotPasswordNgForm!: NgForm;
 
     forgotPasswordForm!: UntypedFormGroup;
-    showAlert: boolean = false;
+    messages: Message[] = [];
+    submitted: boolean = false;
 
     /**
      * Constructor
      */
     constructor(
         private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder
+        private _formBuilder: UntypedFormBuilder,
+        private _logService: LogService,
+        private _router: Router
     )
     {
     }
@@ -49,44 +59,54 @@ export class AuthForgotPasswordComponent implements OnInit
     /**
      * Send the reset link
      */
-    sendResetLink(): void
+    sendResetLink = (): Observable<any> =>
     {
-        // Return if the form is invalid
         if ( this.forgotPasswordForm.invalid )
         {
-            return;
+            return of(null);
         }
 
-        // Disable the form
         this.forgotPasswordForm.disable();
+        this.messages = [];
+        const email = this.forgotPasswordForm.get('email')?.value;
 
-        // Hide the alert
-        this.showAlert = false;
+        return this._authService.forgotPassword(email).pipe(
+            catchError(error => ExceptionUtils.createServerException(error, this._logService))
+        );
+    }
 
-        // Forgot password
-        this._authService.forgotPassword(this.forgotPasswordForm.get('email')?.value)
-            .pipe(
-                finalize(() => {
+    onReceiveResult = (response: any): void =>
+    {
+        this.submitted = false;
 
-                    // Re-enable the form
-                    this.forgotPasswordForm.enable();
+        if ( UrlUtils.validateServerResponse(response) )
+        {
+            this._logService.createMessage({
+                logLevel: LogLevel.Success,
+                summary: MessageConstants.SUCCESS.passwordRecovery.summary,
+                message: MessageConstants.SUCCESS.passwordRecovery.detail
+            });
 
-                    // Reset the form
-                    this.forgotPasswordNgForm.resetForm();
+            this._router.navigateByUrl('/reset-password');
+        }
+        else
+        {
+            this._logService.createMessage({
+                logLevel: LogLevel.Error,
+                summary: MessageConstants.ERROR.passwordRecovery.summary,
+                message: MessageConstants.ERROR.passwordRecovery.detail
+            });
 
-                    // Show the alert
-                    this.showAlert = true;
-                })
-            )
-            .subscribe(
-                (response) => {
+            this.forgotPasswordForm.enable();
+            this.forgotPasswordNgForm.resetForm();
+        }
+    }
 
-                    // Set the alert
-                },
-                (response) => {
-
-                    // Set the alert
-                }
-            );
+    onReceiveError = (error: any): void =>
+    {
+        this.forgotPasswordForm.enable();
+        this.forgotPasswordNgForm.resetForm();
+        this._logService.debug(error);
+        this.submitted = false;
     }
 }

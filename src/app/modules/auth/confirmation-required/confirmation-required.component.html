@@ -1,27 +1,63 @@
 <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
-    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
-        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
-            <!-- Logo -->
-            <img
-              src="assets/images/logo.png"
-              class="w-100"
-              alt="Logo image">
+  <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
+    <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
+      <!-- Logo -->
+      <img
+        src="assets/images/logo.png"
+        class="w-30"
+        alt="Logo image">
 
-            <!-- Title -->
-            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Confirmação necessária</div>
-            <div class="mt-4">
-                Um e-mail de confirmação com instruções foi enviado para seu endereço de e-mail.
-                Siga essas instruções para confirmar seu endereço de e-mail e ativar sua conta.
-            </div>
+      <!-- Title -->
+      <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Confirmação necessária</div>
+      <div class="mt-4">
+          Um e-mail de confirmação com um código de verificação foi enviado para seu endereço de e-mail.
+          Digite o código de confirmação abaixo para ativar sua conta.
+      </div>
 
-            <!-- Form footer -->
-            <div class="mt-8 text-md font-medium text-secondary">
-                <span>Retornar para</span>
-                <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-in']">login
-                </a>
-            </div>
+      <!-- Form footer -->
+      <div class="mt-8 font-medium text-secondary flex justify-center items-center"
+           [formGroup]="confirmForm" #confirmNgForm="ngForm">
+
+        <!-- Code field -->
+        <div class="flex flex-col">
+            <span class="p-float-label">
+              <p-inputMask mask="9  9  9  9"
+                           id="code"
+                           formControlName="code"
+                           class="mr-2 w-full"
+                           placeholder="9  9  9  9"
+                           [style]="{'width': '100%'}">
+              </p-inputMask>
+              <label for="code">Código</label>
+            </span>
+          <p-message class="w-full mt-2"
+                     severity="error"
+                     text="Obrigatório"
+                     *ngIf="confirmForm.get('code')?.invalid && submitted">
+          </p-message>
         </div>
+
+      <app-async-button
+          class="ml-2"
+          [label]="'pi pi-check'"
+          [useLabelIcon]="true"
+          [asyncCall]="confirmActivationCode"
+          [onReceiveData]="onReceiveActiveSuccess"
+          [onReceiveError]="onReceiveActiveError"
+          [disabled]="confirmForm.invalid || submitted"
+      ></app-async-button>
+
+      </div>
+      <div class="mt-8 font-medium text-secondary">
+        <span>Não recebeu o email?</span>
+        <a (click)="resendActivationCode()"
+          class="ml-1 text-blue-800 hover:underline cursor-pointer">
+          Reenviar
+        </a>
+      </div>
     </div>
+  </div>
+  <app-project-info class="relative hidden md:flex flex-auto items-center justify-center w-1/2
+        h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l rounded-2xl shadow">
+  </app-project-info>
 </div>

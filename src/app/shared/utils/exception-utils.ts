@@ -1,8 +1,8 @@
 import StringUtils from 'app/shared/utils/string-utils';
-import ArrayUtils from 'app/shared/utils/array-utils';
 import { Observable, of } from 'rxjs';
 import { LogService } from 'app/core/services/debug/log.service';
 import { ServerError } from 'app/core/models/base/server-error.types';
+import Linq from "./linq-utils";
 
 class ExceptionUtils
 {
@@ -17,7 +17,7 @@ class ExceptionUtils
   static createServerException(errorObj: any, logService: LogService): Observable<any>
   {
     const error: ServerError = ExceptionUtils.getServerError(errorObj);
-    logService.debug(ArrayUtils.firstOrDefault(error.errors) ?? StringUtils.empty());
+    logService.debug(Linq.firstOrDefault(error.errors) ?? StringUtils.empty());
     return of(error);
   }
 
@@ -33,7 +33,7 @@ class ExceptionUtils
     }
 
     const errors: string[] = errorObj.errors;
-    return ArrayUtils.firstOrDefault(errors) ?? invalidMessage;
+    return Linq.firstOrDefault(errors) ?? invalidMessage;
   }
 
   static getServerError(errorObj: any): ServerError

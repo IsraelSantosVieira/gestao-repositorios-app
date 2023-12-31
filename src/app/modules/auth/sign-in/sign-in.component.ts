@@ -52,7 +52,7 @@ export class AuthSignInComponent implements OnInit
   {
     this.submitted = false;
     const rememberMe = localStorage.getItem(environment.localStore.rememberMe);
-    let fillEmail = 'admin@gmail.com';
+    let fillEmail = 'admin@repositorio.com';
     let fillPassword = '123456';
 
     if ( environment.production )

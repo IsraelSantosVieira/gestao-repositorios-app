@@ -43,25 +43,17 @@ export const appRoutes: Routes = [
     ]
   },
 
-  // Landing routes
-  {
-    path: '',
-    component  : LayoutComponent,
-    data: {
-      layout: 'empty'
-    },
-    children   : [
-      {path: 'landing-page', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
-    ]
-  },
-
   // Admin routes
   {
     path       : '',
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     component  : LayoutComponent,
+    data: {
+      layout: 'classic'
+    },
     children   : [
+      {path: 'landing-page', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
       {path: '404-not-found', pathMatch: 'full', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.module').then(m => m.Error404Module)},
       {path: '**', redirectTo: '404-not-found'}
     ]

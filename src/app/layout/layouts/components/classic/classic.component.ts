@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject } from 'rxjs';
+import { LoadingBarService } from "../../../../core/services/misc/loading-bar.service";
 
 @Component({
     selector     : 'classic-layout',
@@ -9,6 +10,8 @@ import { Subject } from 'rxjs';
 export class ClassicLayoutComponent implements OnInit, OnDestroy
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    protected readonly LoadingBarService = LoadingBarService;
 
     /**
      * Constructor

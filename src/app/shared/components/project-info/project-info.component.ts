@@ -8,26 +8,10 @@ import { appConfig } from 'app/core/config/app.config';
 })
 export class ProjectInfoComponent {
 
+  protected readonly appConfig = appConfig;
+
   constructor()
   {
   }
 
-
-  goToAppPage(): void {
-    window.open('https://github.com/IsraelSantosVieira/gestao-repositorios-app', '_blank');
-  }
-
-  goToApiPage(): void {
-    window.open('https://github.com/IsraelSantosVieira/gestao-repositorios-api', '_blank');
-  }
-
-  goToLinkedInPage(): void {
-    window.open('https://www.linkedin.com/in/israel-vieira-b957b4224', '_blank');
-  }
-
-  goToPrimePage(): void {
-    window.open('https://primeng.org/', '_blank');
-  }
-
-  protected readonly appConfig = appConfig;
 }

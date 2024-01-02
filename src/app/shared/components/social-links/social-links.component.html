@@ -1,0 +1,53 @@
+<div *ngIf="!onlyIcons" class="flex items-center space-x-4">
+    <p-button icon="pi pi-github"
+              [rounded]="true"
+              [raised]="true"
+              [size]="getSize()"
+              severity="secondary"
+              (onClick)="goToAppPage()">
+    </p-button>
+    <p-button icon="pi pi-database"
+              [rounded]="true"
+              [raised]="true"
+              [size]="getSize()"
+              severity="secondary"
+              (onClick)="goToApiPage()">
+    </p-button>
+    <p-button icon="pi pi-linkedin"
+              [rounded]="true"
+              [raised]="true"
+              [size]="getSize()"
+              severity="secondary"
+              (onClick)="goToLinkedInPage()">
+    </p-button>
+    <p-button icon="pi pi-prime"
+              [rounded]="true"
+              [raised]="true"
+              [size]="getSize()"
+              severity="secondary"
+              (onClick)="goToPrimePage()">
+    </p-button>
+</div>
+
+<div *ngIf="onlyIcons" class="flex flex-wrap align-items-center gap-5 text-gray-500">
+    <button (click)="goToAppPage()"
+        class="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem
+                border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+        <i class="pi pi-github text-2xl"></i>
+    </button>
+    <button (click)="goToApiPage()"
+        class="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem
+                border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+        <i class="pi pi-database text-2xl"></i>
+    </button>
+    <button (click)="goToLinkedInPage()"
+        class="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem
+                border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+        <i class="pi pi-linkedin text-2xl"></i>
+    </button>
+    <button (click)="goToPrimePage()"
+        class="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem
+                border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+        <i class="pi pi-prime text-2xl"></i>
+    </button>
+</div>

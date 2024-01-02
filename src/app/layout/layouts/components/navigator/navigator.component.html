@@ -1,68 +1,61 @@
 <!-- Nav bar -->
-<div class="bg-white font-sans w-full m-0 sticky top-0 z-50">
-    <div class="bg-indigo-950 shadow">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between py-4">
-                <div class="flex items-center justify-center gap-4">
-                    <img
-                        src="assets/images/logo-2.png"
-                        class="w-10"
-                        alt="Logo image">
+<nav class="bg-indigo-950 border-gray-200 dark:bg-gray-900">
+    <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
+        <a class="flex items-center space-x-3 rtl:space-x-reverse">
+            <img src="assets/images/logo/logo-2.png"
+                class="w-10"
+                alt="Logo image">
 
-                    <span class="text-white font-bold text-3xl">
-                        Repositorio App
-                    </span>
-                </div>
-
-                <div class="hidden sm:flex sm:items-center">
-                    <!--<a href="#" class="text-gray-800 text-sm font-semibold hover:text-purple-600 mr-4">Products</a>-->
-                </div>
-
-                <div class="hidden sm:flex sm:items-center">
-                    <!--<a href="#" class="text-gray-800 text-sm font-semibold hover:text-purple-600 mr-4">Sign in</a>
-                   <a href="#" class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-purple-600 hover:border-purple-600">Sign up</a>-->
-                </div>
-
-                <div class="sm:hidden cursor-pointer">
-                     Logo Here
-                </div>
-            </div>
-
-            <div class="block sm:hidden bg-white border-t-2 py-2">
-                <div class="flex flex-col">
-                    <!--<a href="#" class="text-gray-800 text-sm font-semibold hover:text-purple-600 mb-1">Products</a>-->
-
-                    <div class="flex justify-between items-center border-t-2 pt-2">
-                        <!--<a href="#" class="text-gray-800 text-sm font-semibold hover:text-purple-600 mr-4">Sign in</a>
-                        <a href="#" class="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-purple-600 hover:border-purple-600">Sign up</a>-->
-                    </div>
-                </div>
-            </div>
+            <span class="text-white font-bold text-3xl">
+                {{_appConfig.appName}}
+            </span>
+        </a>
+        <div class="flex items-center space-x-6 rtl:space-x-reverse top-menu">
+            <p-menubar styleClass="bg-transparent border-transparent max-h-10"
+                       [model]="topItems"
+            ></p-menubar>
+            <p-avatar [image]="getAvatarImage()"
+                      (click)="menu.toggle($event)"
+                      styleClass="mr-2 hover:animate-pulse cursor-pointer"
+                      size="large"
+                      shape="circle">
+            </p-avatar>
         </div>
     </div>
+</nav>
 
-    <!-- Header -->
-    <div class="relative flex flex-0 items-center w-full h-16 md:z-49 shadow">
+<!-- Profile menu -->
+<p-menu #menu [model]="profileItems" [popup]="true">
+    <ng-template pTemplate="item" let-item>
+        <a [attr.tabindex]="-1" class="p-menuitem-link flex justify-content-between align-items-center p-3"
+           [routerLink]="item.routerLink">
+            <div>
+                <span [class]="item.icon"></span>
+                <span> {{ item.label }}</span>
+            </div>
+            <div>
+                <span *ngIf="item.shortcut" [class]="item.shortcutClass">{{ item.shortcut }}</span>
+                <p-badge *ngIf="item.badge" [value]="item.badge" [severity]="item.badgeSeverity"></p-badge>
+            </div>
+        </a>
+    </ng-template>
+</p-menu>
+
+<!-- Loading bar -->
+<p-progressBar mode="indeterminate"
+               class="w-full"
+               [style]="{
+                   'height': '3px',
+                   'z-index': '999',
+               }"
+               *ngIf="_loadingService.isLoading"
+></p-progressBar>
+<nav class="bg-gray-50 dark:bg-gray-700">
+    <div class="max-w-screen-xl px-4 py-3 mx-auto">
         <div class="flex items-center">
-            <nav class="p-2 bg-transparent">
-                <ul class="flex justify-start space-x-4 list-none pl-0">
-                    <li *ngFor="let item of items" class="relative group">
-                        <a class="hover:bg-indigo-100 hover:text-indigo-600 cursor-pointer px-3 py-1 rounded">
-                            <i *ngIf="item.icon" [class]="item.icon + ' mr-2'"></i>
-                            {{ item.label }}
-                        </a>
-                        <ul *ngIf="item.items" class="absolute hidden group-hover:block bg-white shadow-lg border border-gray-200 rounded list-none pl-0"
-                            style="top: 100%; left: 0;">
-                            <li *ngFor="let subItem of item.items" class="whitespace-nowrap px-4 py-2 hover:bg-indigo-100 hover:text-indigo-600">
-                                <a class="cursor-pointer">
-                                    <i *ngIf="subItem.icon" [class]="subItem.icon + ' mr-2'"></i>
-                                    {{ subItem.label }}
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
+            <p-menubar [autoDisplay]="false" styleClass="bg-transparent border-transparent max-h-10"
+                       [model]="items"
+            ></p-menubar>
         </div>
     </div>
-</div>
+</nav>

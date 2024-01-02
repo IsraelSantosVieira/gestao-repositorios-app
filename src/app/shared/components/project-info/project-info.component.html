@@ -12,7 +12,7 @@
     <!-- Background -->
     <img class="absolute pointer-events-none"
          style="top: -100%; left: -100%; opacity: 0.03"
-         src="assets/images/background-2.png"
+         src="assets/images/backgrounds/background-2.png"
     />
 
     <!-- @formatter:on -->
@@ -23,32 +23,7 @@
     </div>
 
     <!-- Single sign-on buttons -->
-    <div class="flex items-center mt-8 space-x-4">
-      <p-button icon="pi pi-github"
-                [rounded]="true"
-                [raised]="true"
-                severity="secondary"
-                (onClick)="goToAppPage()">
-      </p-button>
-      <p-button icon="pi pi-database"
-                [rounded]="true"
-                [raised]="true"
-                severity="secondary"
-                (onClick)="goToApiPage()">
-      </p-button>
-      <p-button icon="pi pi-linkedin"
-                [rounded]="true"
-                [raised]="true"
-                severity="secondary"
-                (onClick)="goToLinkedInPage()">
-      </p-button>
-      <p-button icon="pi pi-prime"
-                [rounded]="true"
-                [raised]="true"
-                severity="secondary"
-                (onClick)="goToPrimePage()">
-      </p-button>
-    </div>
+    <app-social-links class="mt-8"></app-social-links>
   </div>
 </div>
 

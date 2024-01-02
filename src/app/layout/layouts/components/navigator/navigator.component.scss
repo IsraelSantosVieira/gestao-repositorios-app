@@ -1,0 +1,14 @@
+::ng-deep .top-menu .p-menuitem-text {
+  color: #eaeaea;
+}
+
+:host ::ng-deep .top-menu .p-menuitem-link:hover {
+  background-color: var(--primary-500);
+  border-radius: 6px;
+}
+
+@media (max-width: 767px) {
+  .p-menubar .p-menu-list {
+    width: 50vw;
+  }
+}

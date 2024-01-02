@@ -6,6 +6,8 @@ import { ClassicLayoutComponent } from 'app/layout/layouts/components/classic/cl
 import { NavigatorComponent } from "../navigator/navigator.component";
 import { LayoutModule } from "../../../layout.module";
 import { PrimeMiscModule } from "../../../../shared/prime/prime-misc.module";
+import { PrimeMenuModule } from "../../../../shared/prime/prime-menu.module";
+import { FooterComponent } from "../footer/footer.component";
 
 @NgModule({
     declarations: [
@@ -16,7 +18,9 @@ import { PrimeMiscModule } from "../../../../shared/prime/prime-misc.module";
         HttpClientModule,
         RouterModule,
         SharedModule,
-        PrimeMiscModule
+        PrimeMiscModule,
+        PrimeMenuModule,
+        FooterComponent
     ],
     exports     : [
         ClassicLayoutComponent

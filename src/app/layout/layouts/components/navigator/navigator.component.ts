@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MenuItem } from "primeng/api";
 import { NavigatorItem } from "../../../../core/models/misc/navigator-item.types";
+import { appConfig } from "../../../../core/config/app.config";
+import { MenuItem, MenuItemCommandEvent } from "primeng/api";
+import { UserService } from "../../../../core/services/auth/user.service";
+import { User } from "../../../../core/models/user/user.types";
+import { LogService } from "../../../../core/services/debug/log.service";
+import { LoadingBarService } from "../../../../core/services/misc/loading-bar.service";
+import { AuthService } from "../../../../core/services/auth/auth.service";
 
 @Component({
   selector: 'app-navigator',
@@ -11,130 +16,106 @@ import { NavigatorItem } from "../../../../core/models/misc/navigator-item.types
 export class NavigatorComponent implements OnInit
 {
 
-  items: NavigatorItem[] | undefined;
+  topItems: MenuItem[] | undefined;
+  items: MenuItem[] | undefined;
+  profileItems: MenuItem[] | undefined;
+
+  protected _appConfig = appConfig;
+  protected readonly _loadingService = LoadingBarService;
+
+  private _isMasterUser: boolean = false;
+
+  constructor(
+      private _userService: UserService,
+      private _logService: LogService,
+      private _authService: AuthService
+  )
+  {
+  }
 
   ngOnInit(): void
   {
+    this._userService.user$.subscribe((user: User): void =>
+    {
+      this._isMasterUser = user.master;
+      this._logService.debug('Master: ' + this._isMasterUser);
+    });
+
+    const navigator = this;
+    this.profileItems = [
+      {
+        label: 'Meu perfil'
+      },
+      {
+        label: 'Minha coleção',
+      },
+      {
+        label: 'Sair',
+        command(_: MenuItemCommandEvent): void
+        {
+          navigator.signOut();
+        }
+      }
+    ]
+
+    this.topItems = [
+      {
+        label: 'Sobre'
+      },
+      {
+        label: 'Contato'
+      },
+      {
+        label: 'Política de Privacidade'
+      }
+    ]
+
     this.items = [
       {
-        label: 'File',
-        icon: 'pi pi-file',
-        items: [
-          {
-            label: 'New',
-            icon: 'pi pi-fw pi-plus',
-            items: [
-              {
-                label: 'Bookmark',
-                icon: 'pi pi-fw pi-bookmark'
-              },
-              {
-                label: 'Video',
-                icon: 'pi pi-fw pi-video'
-              }
-            ]
-          },
-          {
-            label: 'Delete',
-            icon: 'pi pi-fw pi-trash'
-          },
-          {
-            label: 'Export',
-            icon: 'pi pi-fw pi-external-link'
-          }
-        ]
+        label: 'Início',
+        icon: 'pi pi-home',
       },
       {
-        label: 'Edit',
-        icon: 'pi pi-fw pi-pencil',
-        items: [
-          {
-            label: 'Left',
-            icon: 'pi pi-fw pi-align-left'
-          },
-          {
-            label: 'Right',
-            icon: 'pi pi-fw pi-align-right'
-          },
-          {
-            label: 'Center',
-            icon: 'pi pi-fw pi-align-center'
-          },
-          {
-            label: 'Justify',
-            icon: 'pi pi-fw pi-align-justify'
-          }
-        ]
+        separator: true
       },
       {
-        label: 'Users',
-        icon: 'pi pi-fw pi-user',
-        items: [
-          {
-            label: 'New',
-            icon: 'pi pi-fw pi-user-plus'
-          },
-          {
-            label: 'Delete',
-            icon: 'pi pi-fw pi-user-minus'
-          },
-          {
-            label: 'Search',
-            icon: 'pi pi-fw pi-users',
-            items: [
-              {
-                label: 'Filter',
-                icon: 'pi pi-fw pi-filter',
-                items: [
-                  {
-                    label: 'Print',
-                    icon: 'pi pi-fw pi-print'
-                  }
-                ]
-              },
-              {
-                icon: 'pi pi-fw pi-bars',
-                label: 'List'
-              }
-            ]
-          }
-        ]
+        label: 'Recursos Educacionais',
       },
       {
-        label: 'Events',
-        icon: 'pi pi-fw pi-calendar',
-        items: [
-          {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            items: [
-              {
-                label: 'Save',
-                icon: 'pi pi-fw pi-calendar-plus'
-              },
-              {
-                label: 'Delete',
-                icon: 'pi pi-fw pi-calendar-minus'
-              }
-            ]
-          },
-          {
-            label: 'Archieve',
-            icon: 'pi pi-fw pi-calendar-times',
-            items: [
-              {
-                label: 'Remove',
-                icon: 'pi pi-fw pi-calendar-minus'
-              }
-            ]
-          }
-        ]
+        label: 'Minha Coleção',
       },
       {
-        label: 'Quit',
-        icon: 'pi pi-fw pi-power-off'
+        label: 'Painel Administrativo',
+        icon: 'pi pi-bookmark',
+        visible: this._isMasterUser
+      },
+      {
+        label: 'Configurações',
+        icon: 'pi pi-cog',
+        visible: this._isMasterUser,
+        items: [
+          {
+            label: 'Servidor'
+          },
+          {
+            label: 'Usuários'
+          },
+          {
+            label: 'Parâmetros'
+          }
+        ]
       }
     ];
   }
 
+  getAvatarImage(): string
+  {
+    return 'assets/images/misc/avatar.png';
+  }
+
+  signOut(): void
+  {
+    this._authService.signOut();
+    location.reload();
+  }
 }
